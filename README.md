@@ -30,6 +30,8 @@ Read more about the picarto Oauth authentication API [here](https://oauth.picart
 
 ### Example
 ```c#
+Using PicartoWrapperAPI.Clients;
+
  var client = new PicartoReadOnlyClient("Djinnet");
  var channel = client.GetOnlineChannels();
 
