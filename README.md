@@ -12,7 +12,7 @@ Most of the methods, functions, models and etc are named after their api from pi
 The Picarto API is documented [here](https://docs.picarto.tv/api/).
 
 # Installation
-
+## SOON FINISHING (you can't use this ATM)
 PicartoWrapperAPI is [available on NuGet](https://www.nuget.org/packages/picartowrapperapi/). Use the package manager
 console in Visual Studio to install it:
 
