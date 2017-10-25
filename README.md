@@ -88,6 +88,6 @@ The following APIs are not yet implemented by PicartoWrapperAPI, but I'm slowly 
 | [PUT - webhooks with ID](https://docs.picarto.tv/api/#!/webhook/put_webhooks_webhook_id) | Update a webhook's URI|
 
 ## License
-Used some code from [Gibletto](https://github.com/gibletto).
-Used some code from [michidk](https://github.com/michidk)
-open-source library - MIT license should be fine for that.
+- Used some code from [Gibletto](https://github.com/gibletto).
+- Used some code from [michidk](https://github.com/michidk)
+- open-source library - MIT license should be fine for that.
