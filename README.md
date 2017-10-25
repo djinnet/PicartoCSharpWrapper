@@ -86,6 +86,11 @@ The following APIs are not yet implemented by PicartoWrapperAPI, but I'm slowly 
 | [DELETE - webhooks with ID](https://docs.picarto.tv/api/#!/webhook/delete_webhooks_webhook_id) | Delete a webhook|
 | [GET - webhooks with ID](https://docs.picarto.tv/api/#!/webhook/get_webhooks_webhook_id) | Get a webhook|
 | [PUT - webhooks with ID](https://docs.picarto.tv/api/#!/webhook/put_webhooks_webhook_id) | Update a webhook's URI|
+| [Chat popout](https://picarto.tv/chatpopout/{username}/public) | Get chat popout|
+| [Thumbnail](https://thumb-us1.picarto.tv/thumbnail/{username}.jpg) | Get thumbnail|
+| [GET - User Image](https://picarto.tv/user_data/usrimg/{username}/dsdefault.jpg) | Get image of the user|
+| [GET - User channel title]() | Get user's channel title|
+| [GET - Live]() | Is channel live|
 
 ## License
 - Used some code from [Gibletto](https://github.com/gibletto).
