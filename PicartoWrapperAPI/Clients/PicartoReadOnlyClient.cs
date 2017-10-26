@@ -63,6 +63,39 @@ namespace PicartoWrapperAPI.Clients
             return response.Data;
         }
 
+        public string GetAccountType()
+        {
+            string name = Clientname;
+            var request = GetRequest("channel/name/{name}", Method.GET);
+            request.AddUrlSegment("name", name);
+            var response = restClient.Execute<Channel>(request);
+            return response.Data.account_type;
+        }
+
+        public bool Live()
+        {
+            string name = Clientname;
+            var request = GetRequest("channel/name/{name}", Method.GET);
+            request.AddUrlSegment("name", name);
+            var response = restClient.Execute<Channel>(request);
+            return response.Data.online;
+        }
+
+        public string GetChannelTitle()
+        {
+            string name = Clientname;
+            var request = GetRequest("channel/name/{name}", Method.GET);
+            request.AddUrlSegment("name", name);
+            var response = restClient.Execute<Channel>(request);
+            return response.Data.title;
+        }
+
+        public string GetUserImage(string name)
+        {
+            name = name.ToLower();
+            return $"https://picarto.tv/user_data/usrimg/{name}/dsdefault.jpg";
+        }
+
         public List<OnlineDetails> GetOnlineChannels()
         {
             var request = GetRequest("online", Method.GET);
