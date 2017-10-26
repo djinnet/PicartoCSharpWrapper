@@ -91,6 +91,8 @@ The following APIs are not yet implemented by PicartoWrapperAPI, but I'm slowly 
 | [GET - User Image](https://picarto.tv/user_data/usrimg/{username}/dsdefault.jpg) | Get image of the user|
 | [GET - User channel title]() | Get user's channel title|
 | [GET - Live]() | Is channel live|
+| [GET - account_type]() | Get which account_type is the user|
+| [GET - flags]() | Get which flags the user has|
 
 ## License
 - Used some code from [Gibletto](https://github.com/gibletto).
