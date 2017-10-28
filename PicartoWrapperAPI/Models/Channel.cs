@@ -28,6 +28,7 @@ namespace PicartoWrapperAPI.Models
         public bool guest_chat { get; set; }
         public DateTime last_live { get; set; }
         public List<string> tags { get; set; }
+        public List<string> languages { get; set; }
         public List<Multistream> multistream { get; set; }
     }
 }
