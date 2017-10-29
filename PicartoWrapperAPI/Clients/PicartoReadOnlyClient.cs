@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System;
 
 namespace PicartoWrapperAPI.Clients
 {
@@ -62,13 +63,23 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="ID">input</param>
         /// <returns>channel</returns>
-        public Channel GetIDChannel(int? ID)
+        public Channel GetIDChannel(int ID)
         {
-            if (ID == null)
-            {
-                ID = ClientID;
-            }
+            
+            var request = GetRequest("channel/id/{ID}", Method.GET);
+            request.AddUrlSegment("ID", ID.ToString());
+            var response = restClient.Execute<Channel>(request);
+            return response.Data;
+        }
 
+        /// <summary>
+        /// Get Channel based on ID from client
+        /// </summary>
+        /// <param name="ID">input</param>
+        /// <returns>channel</returns>
+        public Channel GetIDChannel()
+        {
+            int ID = ClientID;
             var request = GetRequest("channel/id/{ID}", Method.GET);
             request.AddUrlSegment("ID", ID.ToString());
             var response = restClient.Execute<Channel>(request);
@@ -83,6 +94,11 @@ namespace PicartoWrapperAPI.Clients
         {
             if (string.IsNullOrWhiteSpace(name))
             {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
+                //if name is empty, check if there are Clientname
                 name = Clientname;
             }
 
@@ -92,13 +108,23 @@ namespace PicartoWrapperAPI.Clients
             return response.Data;
         }
 
+
+
         /// <summary>
         /// Get Account type from channel based on picarto read only name.
         /// </summary>
         /// <returns>Account_type</returns>
-        public string GetAccountType()
+        public string GetAccountType(string name = null)
         {
-            string name = Clientname;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
+                //if name is empty, check if there are Clientname
+                name = Clientname;
+            }
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
             var response = restClient.Execute<Channel>(request);
@@ -146,19 +172,37 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">username</param>
         /// <returns>url of the user's image</returns>
-        public string GetUserImage(string name)
+        public string GetUserImage(string name = null)
         {
-            name = name.ToLower();
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
+                //if name is empty, check if there are Clientname
+                name = Clientname;
+                name = name.ToLower();
+            }
+            
             var url = $"https://picarto.tv/user_data/usrimg/{name}/dsdefault.jpg";
             return url;
         }
 
 
-
+        //TO-DO: CHECK FOR THE UPDATE
         //remember to update in the future.
-        public List<string> GetChannelLanguages()
+        public List<string> GetChannelLanguages(string name = null)
         {
-            string name = Clientname;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
+                //if name is empty, check if there are Clientname
+                name = Clientname;
+                }
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
             var response = restClient.Execute<Channel>(request);
@@ -168,10 +212,25 @@ namespace PicartoWrapperAPI.Clients
         /// <summary>
         /// Get an list over those who are online right now on Picarto
         /// </summary>
-        /// <returns>list of online channels</returns>
-        public List<OnlineDetails> GetOnlineChannels()
+        /// <param name="adult">adult is false in default</param>
+        /// <param name="gaming">gaming is false in default</param>
+        /// <param name="category">category is empty in default</param>
+        /// <returns>a list over online channels</returns>
+        public List<OnlineDetails> GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
         {
-            var request = GetRequest("online", Method.GET);
+            var request = GetRequest("online?adult={adult}&gaming={gaming}&categories={strings}", Method.GET);
+            request.AddUrlSegment("adult", adult.ToString());
+            request.AddUrlSegment("gaming", gaming.ToString());
+            if (string.IsNullOrEmpty(category))
+            {
+                category = "";
+                request.AddUrlSegment("strings", category);
+            }
+            else
+            {
+                request.AddUrlSegment("strings", category);
+            }
+            
             request.RequestFormat = DataFormat.Json;
             var response = restClient.Execute<List<OnlineDetails>>(request);
             return response.Data;
@@ -182,9 +241,15 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">input</param>
         /// <returns>url to the chat</returns>
-        public string GetPopOutChat(string name)
+        public string GetPopOutChat(string name = null)
         {
             //TO-DO: Add url in here.
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                //if name is empty, check if there are Clientname
+                name = Clientname;
+                
+            }
             return name;
         }
 
