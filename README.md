@@ -46,22 +46,72 @@ Read more about the picarto Oauth authentication API [here](https://oauth.picart
 
 ### Example
 ```c#
-Using PicartoWrapperAPI.Clients;
+            Using PicartoWrapperAPI.Clients;
 
- var client = new PicartoReadOnlyClient("Djinnet");
- var channel = client.GetOnlineChannels();
+            //You have to pass at least one parameter to work
+            var client = new PicartoReadOnlyClient(1); //an ID
+            var client2 = new PicartoReadOnlyClient("Djinnet"); //an username
 
- var mychannel = client.GetNameChannel();
+            //allow to fetch info about every online channel
+            var channel = client.GetOnlineChannels(true);
 
- Console.WriteLine(mychannel.title);
+            //allow to get channel property from my client2 object
+            var client2Channel = client2.GetNameChannel();
 
- Console.WriteLine("This is a list over those who are online on picarto right now.");
+            //Allow to check on a certain user is online based on a string
+            var isOnline = client.Live("djinnet");
 
-            
- foreach (var user in channel)
- {
-    Console.WriteLine(user.Name);
- }
+            //allow to check which account type the user is. 
+            //you can also check on other users's account type based on string. There are a override method for that.
+            var myaccounttype = client2.GetAccountType();
+
+            //you can get your channel's title based on your ID
+            Console.WriteLine(client.GetIDChannel().title);
+
+            //then what if you want to get an unknown user's channel title?
+            //you can just write their username as an parameter and it's it. 
+            //Simple and clean.
+            Console.WriteLine(client.GetChannelTitle("Djinnet"));
+
+            //okay, what if I want to know how many are online on Picarto right now.
+            //just use this code then!
+            //it'll returned a list and you can limit the list into an integer.
+            Console.WriteLine($"There are {channel.Capacity} users those who are online on picarto right now.");
+
+            //even variable is possible.
+            Console.WriteLine("My account type is: " + myaccounttype);
+
+            //isOnline is a bool value, so remember to make a if-statement to return if you're online or not.
+            if (isOnline)
+            {
+                Console.WriteLine("I'm Online!");
+            }
+            else
+            {
+                Console.WriteLine("I'm not online!");
+            }
+
+            //you can also return all current users who are online on picarto's name.
+            // remember channel is a list, so therefore you can do this.
+
+            //works with linq. 
+            foreach (var x in channel.Where(x => x.Adult))
+            {
+                //return adult channels
+                Console.WriteLine("{0}, {1}", x.Name, x.Adult);
+            }
+
+            //simple example
+            foreach (var user in channel)
+            {
+                //return not adult and not gaming channels
+                Console.WriteLine(user.Name); 
+            }
+
+
+            //allow me to check if the data is correct. 
+            //not a feature that is required in a program tho. :P (JK)
+            Console.ReadKey();
 
 ```
 
