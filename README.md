@@ -53,7 +53,7 @@ Read more about the picarto Oauth authentication API [here](https://oauth.picart
             var client2 = new PicartoReadOnlyClient("Djinnet"); //an username
 
             //allow to fetch info about every online channel
-            var channel = client.GetOnlineChannels();
+            var channel = client.GetOnlineChannels(true);
 
             //allow to get channel property from my client2 object
             var client2Channel = client2.GetNameChannel();
@@ -92,13 +92,22 @@ Read more about the picarto Oauth authentication API [here](https://oauth.picart
             }
 
             //you can also return all current users who are online on picarto's name.
-             // remember channel is a list, so therefore you can do this.
-            foreach (var user in channel)
+            // remember channel is a list, so therefore you can do this.
+
+            //works with linq. 
+            foreach (var x in channel.Where(x => x.Adult))
             {
-                Console.WriteLine(user.Name);
+                //return adult channels
+                Console.WriteLine("{0}, {1}", x.Name, x.Adult);
             }
 
-            
+            //simple example
+            foreach (var user in channel)
+            {
+                //return not adult and not gaming channels
+                Console.WriteLine(user.Name); 
+            }
+
 
             //allow me to check if the data is correct. 
             //not a feature that is required in a program tho. :P (JK)
