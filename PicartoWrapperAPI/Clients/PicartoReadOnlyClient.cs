@@ -114,7 +114,7 @@ namespace PicartoWrapperAPI.Clients
         /// Get Account type from channel based on picarto read only name.
         /// </summary>
         /// <returns>Account_type</returns>
-        public string GetAccountType(string name = null)
+        public Account_type GetAccountType(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using PicartoWrapperAPI.Enums;
 
 namespace PicartoWrapperAPI.Models
 {
@@ -19,8 +21,13 @@ namespace PicartoWrapperAPI.Models
         public int subscribers { get; set; }
         public bool adult { get; set; }
         public string category { get; set; }
-        public string account_type { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public Account_type account_type { get; set; }
+
+
         public bool commissions { get; set; }
+        
         public string title { get; set; }
         public List<DescriptionPanel> description_panels { get; set; }
         public bool @private { get; set; }
