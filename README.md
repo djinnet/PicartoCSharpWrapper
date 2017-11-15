@@ -1,10 +1,5 @@
 # Picarto C# Wrapper for picarto v1 REST API
 
-## Notes
-This library/wrapper is inspired of/by [Twitch C# Wrapper for the Twitch v3 REST API](https://github.com/michidk/TwitchCSharp)'s development style.
-If it wasn't for michidk's work, I wouldn't be able to make this wrapper. I would love to thank him for his amazing work...
-
-I know that there are a chance that this might break in the future, if so, just contact me or someone who are smarter than a fly to fix it. 
 
 ## Documentation
 This project is a wrapper for picarto API, so that you can interact with it using C#.
@@ -144,7 +139,12 @@ The following APIs are not yet implemented by PicartoWrapperAPI, but I'm slowly 
 | [GET - account_type]() | Get which account_type is the user|
 | [GET - flags]() | Get which flags the user has|
 
+## Notes
+This library/wrapper is inspired of [Twitch C# Wrapper for the Twitch v3 REST API](https://github.com/michidk/TwitchCSharp)'s development style.
+
+I know that there are a chance that this might break in the future, if so, just contact me or submit an Issue.
+
 ## License
 - Used some code from [Gibletto](https://github.com/gibletto).
-- Used some code from [michidk](https://github.com/michidk)
-- open-source library - MIT license should be fine for that.
+- development style from [michidk](https://github.com/michidk)
+- MIT license.
