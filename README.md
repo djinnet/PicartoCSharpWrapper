@@ -8,18 +8,7 @@ The Picarto API is documented [here](https://docs.picarto.tv/api/).
 
 # Installation
 ## SOON FINISHING (you can't use this ATM)
-PicartoWrapperAPI is [available on NuGet](https://www.nuget.org/packages/picartowrapperapi/). Use the package manager
-console in Visual Studio to install it:
 
-```
-Install-Package PicartoWrapperAPI
-```
-
-If you're using .NET Core, you can use the `dotnet` command from your favorite shell:
-
-```
-dotnet add package picartowrapperapi
-```
 
 
 ## Usage
