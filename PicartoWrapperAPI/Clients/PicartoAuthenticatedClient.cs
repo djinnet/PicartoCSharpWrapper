@@ -14,10 +14,10 @@ namespace PicartoWrapperAPI.Clients
             restClient.AddDefaultHeader("Authorization", String.Format("OAuth {0}", oauth));
 
             var user = this.GetMyUser();
-            if (user == null || String.IsNullOrWhiteSpace(user.channel_details.name)){
+            if (user == null || String.IsNullOrWhiteSpace(user.channel_details.Name)){
                 throw new PicartoExeption("Couldn't get the user name!");
             }
-            this.username = user.channel_details.name;
+            this.username = user.channel_details.Name;
         }
 
 

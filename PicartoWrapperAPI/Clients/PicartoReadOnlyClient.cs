@@ -22,8 +22,13 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="clientname"></param>
         /// <param name="url"></param>
-        public PicartoReadOnlyClient(string clientname, string url = PicartoHelper.picartoApiUrl)
+        public PicartoReadOnlyClient(string clientname = null, string url = PicartoHelper.picartoApiUrl)
         {
+            if (!String.IsNullOrEmpty(clientname))
+            {
+                Clientname = clientname;
+            }
+
             Clientname = clientname;
             restClient = new RestClient(url);
             restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
@@ -63,28 +68,18 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="ID">input</param>
         /// <returns>channel</returns>
-        public Channel GetIDChannel(int ID)
+        public Channel GetIDChannel(Nullable<int> ID = null)
         {
-            
+            if (ID == null)
+            {
+                ID = ClientID;
+            }
             var request = GetRequest("channel/id/{ID}", Method.GET);
             request.AddUrlSegment("ID", ID.ToString());
             var response = restClient.Execute<Channel>(request);
             return response.Data;
         }
 
-        /// <summary>
-        /// Get Channel based on ID from client
-        /// </summary>
-        /// <param name="ID">input</param>
-        /// <returns>channel</returns>
-        public Channel GetIDChannel()
-        {
-            int ID = ClientID;
-            var request = GetRequest("channel/id/{ID}", Method.GET);
-            request.AddUrlSegment("ID", ID.ToString());
-            var response = restClient.Execute<Channel>(request);
-            return response.Data;
-        }
 
         /// <summary>
         /// Get Channel based on name from input
@@ -128,7 +123,7 @@ namespace PicartoWrapperAPI.Clients
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
             var response = restClient.Execute<Channel>(request);
-            return response.Data.account_type;
+            return response.Data.Account_type;
         }
 
 
@@ -140,13 +135,17 @@ namespace PicartoWrapperAPI.Clients
         {
             if (string.IsNullOrWhiteSpace(name))
             {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
                 name = Clientname;
             }
             
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
             var response = restClient.Execute<Channel>(request);
-            return response.Data.online;
+            return response.Data.Online;
         }
 
         /// <summary>
@@ -157,15 +156,58 @@ namespace PicartoWrapperAPI.Clients
         {
             if (string.IsNullOrWhiteSpace(name))
             {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
                 name = Clientname;
             }
 
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
             var response = restClient.Execute<Channel>(request);
-            return response.Data.title;
+            return response.Data.Title;
         }
 
+        /// <summary>
+        /// Get Channel video
+        /// </summary>
+        /// <returns>videos of the channel</returns>
+        public ChannelVideo GetChannelNameVideos(string name = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
+                name = Clientname;
+            }
+
+            var request = GetRequest("channel/name/{name}/videos", Method.GET);
+            request.AddUrlSegment("name", name);
+            var response = restClient.Execute<ChannelVideo>(request);
+            return response.Data;
+        }
+
+        /// <summary>
+        /// Get Channel video
+        /// </summary>
+        /// <returns>videos of the channel</returns>
+        public ChannelVideo GetChannelIDVideos(int? ID)
+        {
+            if (ID.HasValue)
+            {
+                ID = ClientID;
+            }
+
+            var request = GetRequest("channel/id/{id}/videos", Method.GET);
+            request.AddUrlSegment("id", ID.Value.ToString());
+            var response = restClient.Execute<ChannelVideo>(request);
+            return response.Data;
+        }
+
+        //todo: update to API 1.2.3
         /// <summary>
         /// Get User's image as an url
         /// Useful for discord bot programming
@@ -190,9 +232,8 @@ namespace PicartoWrapperAPI.Clients
         }
 
 
-        //TO-DO: CHECK FOR THE UPDATE
-        //remember to update in the future.
-        public List<string> GetChannelLanguages(string name = null)
+        //todo: CHECK FOR THE UPDATE - remember to update in the future.
+        public List<Language> GetChannelLanguages(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -206,7 +247,7 @@ namespace PicartoWrapperAPI.Clients
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
             var response = restClient.Execute<Channel>(request);
-            return response.Data.languages;
+            return response.Data.Languages;
         }
 
         /// <summary>
@@ -236,6 +277,7 @@ namespace PicartoWrapperAPI.Clients
             return response.Data;
         }
 
+        //todo: Popout chat
         /// <summary>
         /// Return a url that send a request to popout a chat based on input.
         /// </summary>
@@ -243,9 +285,13 @@ namespace PicartoWrapperAPI.Clients
         /// <returns>url to the chat</returns>
         public string GetPopOutChat(string name = null)
         {
-            //TO-DO: Add url in here.
+            //todo: Add url in here.
             if (string.IsNullOrWhiteSpace(name))
             {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
                 //if name is empty, check if there are Clientname
                 name = Clientname;
                 

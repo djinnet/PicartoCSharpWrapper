@@ -8,10 +8,12 @@ namespace PicartoWrapperAPI.Models
 {
     public class DescriptionPanel
     {
-        public string title { get; set; }
-        public string body { get; set; }
-        public string image { get; set; }
-        public string image_link { get; set; }
-        public int position { get; set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
+        public string Image { get; set; }
+        public string Image_link { get; set; }
+        public string Button_text { get; set; }
+        public string Button_link { get; set; }
+        public int Position { get; set; }
     }
 }

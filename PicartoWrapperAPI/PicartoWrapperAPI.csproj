@@ -33,11 +33,12 @@
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=106.1.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.1.0\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -63,11 +64,14 @@
     <Compile Include="Helpers\RequestExtensions.cs" />
     <Compile Include="Interfaces\IJsonSerializer.cs" />
     <Compile Include="Interfaces\IPicartoClient.cs" />
+    <Compile Include="Models\BasicChannelInfo.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\Channel.cs" />
+    <Compile Include="Models\ChannelVideo.cs" />
     <Compile Include="Models\DescriptionPanel.cs" />
     <Compile Include="Models\Events.cs" />
     <Compile Include="Models\Following.cs" />
+    <Compile Include="Models\Language.cs" />
     <Compile Include="Models\Multistream.cs" />
     <Compile Include="Models\OnlineChannels.cs" />
     <Compile Include="Models\OnlineDetails.cs" />
@@ -75,6 +79,7 @@
     <Compile Include="Models\PicartoResponse.cs" />
     <Compile Include="Models\Subscription.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\VideoSearchResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

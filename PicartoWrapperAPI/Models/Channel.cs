@@ -12,30 +12,31 @@ namespace PicartoWrapperAPI.Models
 
     public class Channel
     {
-        public int user_id { get; set; }
-        public string name { get; set; }
-        public bool online { get; set; }
-        public int viewers { get; set; }
-        public int viewers_total { get; set; }
-        public int followers { get; set; }
-        public int subscribers { get; set; }
-        public bool adult { get; set; }
-        public string category { get; set; }
+        public int User_id { get; set; }
+        public string Name { get; set; }
+        public bool Online { get; set; }
+        public int Viewers { get; set; }
+        public int Viewers_total { get; set; }
+        public string Thumbnail { get; set; }
+        public int Followers { get; set; }
+        public int Subscribers { get; set; }
+        public bool Adult { get; set; }
+        public string Category { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public Account_type account_type { get; set; }
+        public Account_type Account_type { get; set; }
 
 
-        public bool commissions { get; set; }
+        public bool Commissions { get; set; }
         
-        public string title { get; set; }
-        public List<DescriptionPanel> description_panels { get; set; }
+        public string Title { get; set; }
+        public List<DescriptionPanel> Description_panels { get; set; }
         public bool @private { get; set; }
-        public bool gaming { get; set; }
-        public bool guest_chat { get; set; }
-        public DateTime last_live { get; set; }
-        public List<string> tags { get; set; }
-        public List<string> languages { get; set; }
-        public List<Multistream> multistream { get; set; }
+        public bool Gaming { get; set; }
+        public bool Guest_chat { get; set; }
+        public DateTime Last_live { get; set; }
+        public List<string> Tags { get; set; }
+        public List<Multistream> Multistream { get; set; }
+        public List<Language> Languages { get; set; }
     }
 }
