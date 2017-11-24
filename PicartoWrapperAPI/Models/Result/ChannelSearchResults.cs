@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace PicartoWrapperAPI.Models
 {
-    public class BasicChannelInfo
+    public class ChannelSearchResults
     {
-        public int User_id { get; set; }
-        public string Name { get; set; }
-        public bool Online { get; set; }
+        public List<BasicChannelInfo> ListofBasicChannels { get; set; }
     }
 }

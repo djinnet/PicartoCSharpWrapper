@@ -14,10 +14,11 @@ namespace PicartoWrapperAPI.Models
     {
         public int User_id { get; set; }
         public string Name { get; set; }
+        public string Avatar { get; set; }
         public bool Online { get; set; }
         public int Viewers { get; set; }
         public int Viewers_total { get; set; }
-        public string Thumbnail { get; set; }
+        public Thumbnail Thumbnail { get; set; }
         public int Followers { get; set; }
         public int Subscribers { get; set; }
         public bool Adult { get; set; }

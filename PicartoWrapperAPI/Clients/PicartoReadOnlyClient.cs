@@ -24,12 +24,16 @@ namespace PicartoWrapperAPI.Clients
         /// <param name="url"></param>
         public PicartoReadOnlyClient(string clientname = null, string url = PicartoHelper.picartoApiUrl)
         {
-            if (!String.IsNullOrEmpty(clientname))
+            if (String.IsNullOrEmpty(clientname))
+            {
+                throw new Exception("Clientname don't exist or it's empty!");
+            }
+            else
             {
                 Clientname = clientname;
             }
 
-            Clientname = clientname;
+            //Clientname = clientname;
             restClient = new RestClient(url);
             restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
             restClient.AddHandler("text/json", PicartoJsonDeserializer.Default);
@@ -46,9 +50,17 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="ID"></param>
         /// <param name="url"></param>
-        public PicartoReadOnlyClient(int ID, string url = PicartoHelper.picartoApiUrl)
+        public PicartoReadOnlyClient(Nullable<int> ID = null, string url = PicartoHelper.picartoApiUrl)
         {
-            ClientID = ID;
+            if (ID == null)
+            {
+                throw new Exception("ClientID don't exist or it's empty!");
+            }
+            else
+            {
+                ClientID = ID.Value;
+            }
+
             restClient = new RestClient(url);
             restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
             restClient.AddHandler("text/json", PicartoJsonDeserializer.Default);
@@ -194,27 +206,27 @@ namespace PicartoWrapperAPI.Clients
         /// Get Channel video
         /// </summary>
         /// <returns>videos of the channel</returns>
-        public ChannelVideo GetChannelIDVideos(int? ID)
+        public ChannelVideo GetChannelIDVideos(Nullable<int> ID = null)
         {
-            if (ID.HasValue)
+            if (ID == null)
             {
                 ID = ClientID;
             }
 
             var request = GetRequest("channel/id/{id}/videos", Method.GET);
-            request.AddUrlSegment("id", ID.Value.ToString());
+            request.AddUrlSegment("id", ID.ToString());
             var response = restClient.Execute<ChannelVideo>(request);
             return response.Data;
         }
 
-        //todo: update to API 1.2.3
+        
         /// <summary>
-        /// Get User's image as an url
+        /// Get User's avatar as an string
         /// Useful for discord bot programming
         /// </summary>
-        /// <param name="name">username</param>
-        /// <returns>url of the user's image</returns>
-        public string GetUserImage(string name = null)
+        /// <param name="name">channel name</param>
+        /// <returns>the user's avatar</returns>
+        public string GetUserAvatar(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -224,15 +236,21 @@ namespace PicartoWrapperAPI.Clients
                 }
                 //if name is empty, check if there are Clientname
                 name = Clientname;
-                name = name.ToLower();
             }
-            
-            var url = $"https://picarto.tv/user_data/usrimg/{name}/dsdefault.jpg";
-            return url;
+
+            //var url = $"https://picarto.tv/user_data/usrimg/{name}/dsdefault.jpg";
+            var request = GetRequest("channel/name/{name}", Method.GET);
+            request.AddUrlSegment("name", name);
+            var response = restClient.Execute<BasicChannelInfo>(request);
+            return response.Data.Avatar;
         }
 
 
-        //todo: CHECK FOR THE UPDATE - remember to update in the future.
+        /// <summary>
+        /// Get the channel's languages
+        /// </summary>
+        /// <param name="name">the name of the channel</param>
+        /// <returns>a list of languages from the channel</returns>
         public List<Language> GetChannelLanguages(string name = null)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -246,8 +264,8 @@ namespace PicartoWrapperAPI.Clients
                 }
             var request = GetRequest("channel/name/{name}", Method.GET);
             request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Languages;
+            var response = restClient.Execute<Languages>(request);
+            return response.Data.ListofLanguages;
         }
 
         /// <summary>
@@ -257,7 +275,7 @@ namespace PicartoWrapperAPI.Clients
         /// <param name="gaming">gaming is false in default</param>
         /// <param name="category">category is empty in default</param>
         /// <returns>a list over online channels</returns>
-        public List<OnlineDetails> GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
+        public Channel GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
         {
             var request = GetRequest("online?adult={adult}&gaming={gaming}&categories={strings}", Method.GET);
             request.AddUrlSegment("adult", adult.ToString());
@@ -273,11 +291,11 @@ namespace PicartoWrapperAPI.Clients
             }
             
             request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<List<OnlineDetails>>(request);
+            var response = restClient.Execute<Channel>(request);
             return response.Data;
         }
 
-        //todo: Popout chat
+        
         /// <summary>
         /// Return a url that send a request to popout a chat based on input.
         /// </summary>
@@ -285,7 +303,7 @@ namespace PicartoWrapperAPI.Clients
         /// <returns>url to the chat</returns>
         public string GetPopOutChat(string name = null)
         {
-            //todo: Add url in here.
+            
             if (string.IsNullOrWhiteSpace(name))
             {
                 if (string.IsNullOrEmpty(Clientname))
@@ -296,18 +314,19 @@ namespace PicartoWrapperAPI.Clients
                 name = Clientname;
                 
             }
-            return name;
+            string url = $"https://picarto.tv/chatpopout/{name}/public";
+            return url;
         }
 
         /// <summary>
         /// Get Online catagories
         /// </summary>
         /// <returns>list over online catagories</returns>
-        public List<Category> GetOnlineCategories()
+        public Categories GetOnlineCategories()
         {
             var request = GetRequest("categories", Method.GET);
             request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<List<Category>>(request);
+            var response = restClient.Execute<Categories>(request);
             return response.Data;
         }
 
@@ -315,11 +334,11 @@ namespace PicartoWrapperAPI.Clients
         /// get Online events
         /// </summary>
         /// <returns>list over online events</returns>
-        public List<Events> GetOnlineEvents()
+        public Events GetOnlineEvents()
         {
             var request = GetRequest("events", Method.GET);
             request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<List<Events>>(request);
+            var response = restClient.Execute<Events>(request);
             return response.Data;
         }
 
