@@ -275,7 +275,7 @@ namespace PicartoWrapperAPI.Clients
         /// <param name="gaming">gaming is false in default</param>
         /// <param name="category">category is empty in default</param>
         /// <returns>a list over online channels</returns>
-        public Channel GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
+        public List<OnlineDetails> GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
         {
             var request = GetRequest("online?adult={adult}&gaming={gaming}&categories={strings}", Method.GET);
             request.AddUrlSegment("adult", adult.ToString());
@@ -291,10 +291,30 @@ namespace PicartoWrapperAPI.Clients
             }
             
             request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<Channel>(request);
-            return response.Data;
+            var response = restClient.Execute<OnlineChannels>(request);
+            return response.Data.OnlineDetails;
         }
 
+        /// <summary>
+        /// Get user's thumbnail.
+        /// </summary>
+        /// <param name="name">Username</param>
+        /// <returns>thumbnail</returns>
+        public Thumbnail GetThumbnail(string name = null){
+           if (string.IsNullOrWhiteSpace(name))
+            {
+                if (string.IsNullOrEmpty(Clientname))
+                {
+                    throw new Exception("Clientname don't exist or it's empty!");
+                }
+                //if name is empty, check if there are Clientname
+                name = Clientname;
+                }
+            var request = GetRequest("channel/name/{name}", Method.GET);
+            request.AddUrlSegment("name", name);
+            var response = restClient.Execute<Channel>(request);
+            return response.Data.Thumbnail;
+        } 
         
         /// <summary>
         /// Return a url that send a request to popout a chat based on input.
