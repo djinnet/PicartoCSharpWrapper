@@ -121,17 +121,17 @@ The following APIs are not yet implemented by PicartoWrapperAPI, but I'm slowly 
 | [GET - webhooks with ID](https://docs.picarto.tv/api/#!/webhook/get_webhooks_webhook_id) | Get a webhook|
 | [PUT - webhooks with ID](https://docs.picarto.tv/api/#!/webhook/put_webhooks_webhook_id) | Update a webhook's URI|
 | [Chat popout](https://picarto.tv/chatpopout/{username}/public) | Get chat popout|
-| [Thumbnail](https://thumb-us1.picarto.tv/thumbnail/{username}.jpg) | Get thumbnail|
-| [GET - User Image](https://picarto.tv/user_data/usrimg/{username}/dsdefault.jpg) | Get image of the user|
-| [GET - User channel title]() | Get user's channel title|
-| [GET - Live]() | Is channel live|
-| [GET - account_type]() | Get which account_type is the user|
-| [GET - flags]() | Get which flags the user has|
+
+
+
+
+
+
 
 ## Notes
 This library/wrapper is inspired of [Twitch C# Wrapper for the Twitch v3 REST API](https://github.com/michidk/TwitchCSharp)'s development style.
 
-I know that there are a chance that this might break in the future, if so, just contact me or submit an Issue.
+I know that there are a chance that this might break in the future, if so, just contact me or submit an issue on github.
 
 ## License
 - Used some code from [Gibletto](https://github.com/gibletto).
