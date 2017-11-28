@@ -15,7 +15,7 @@ The Picarto API is documented [here](https://docs.picarto.tv/api/).
 ### Client
 To interact with the API you need at least a [client-ID](#oauth-key-/-client-id). Some requests can only be made by authorized users. These also need a [OAuth-key](#oauth-key-/-client-id).
 
-There are three client classes:
+There are two client classes:
 
 | Class                          | Explanation                                                            |
 | ------------------------------ | ---------------------------------------------------------------------- |
