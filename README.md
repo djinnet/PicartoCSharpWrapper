@@ -7,8 +7,14 @@ Most of the methods, functions, models and etc are named after their api from pi
 The Picarto API is documented [here](https://docs.picarto.tv/api/).
 
 # Installation
-## SOON FINISHING (you can't use this ATM)
-
+## NuGet installation:
+```
+Install-Package PicartoWrapperAPI -Version 1.2.5
+```
+## Dotnet installation:
+```
+dotnet add package PicartoWrapperAPI --version 1.2.5
+```
 
 
 ## Usage
