@@ -3,6 +3,7 @@ using RestSharp;
 using PicartoWrapperAPI.Enums;
 using PicartoWrapperAPI.Helpers;
 using PicartoWrapperAPI.Models;
+using System.Collections.Generic;
 
 namespace PicartoWrapperAPI.Clients
 {
@@ -10,17 +11,22 @@ namespace PicartoWrapperAPI.Clients
     public class PicartoAuthenticatedClient : PicartoReadOnlyClient, IPicartoClient
     {
         private readonly string username;
+
+        protected PicartoAuthenticatedClient(string clientId) : base(clientId)
+        {
+        }
+
         public PicartoAuthenticatedClient(string clientId, string oauth) : base(clientId)
         {
             restClient.AddDefaultHeader("Authorization", String.Format("OAuth {0}", oauth));
 
             var user = this.GetMyUser();
-            if (user == null || String.IsNullOrWhiteSpace(user.Channel_details.Name)){
+            if (user == null || String.IsNullOrWhiteSpace(user.Channel_details.Name))
+            {
                 throw new PicartoExeption("Couldn't get the user name!");
             }
             this.username = user.Channel_details.Name;
         }
-
 
         public UserData GetMyUser()
         {
@@ -29,10 +35,10 @@ namespace PicartoWrapperAPI.Clients
             return response.Data;
         }
 
-        public BasicChannelInfo GetFollowing()
+        public List<BasicChannelInfo> GetFollowing()
         {
             var request = GetRequest("user/following", Method.GET);
-            var response = restClient.Execute<BasicChannelInfo>(request);
+            var response = restClient.Execute<List<BasicChannelInfo>>(request);
             return response.Data;
         }
 
@@ -62,7 +68,7 @@ namespace PicartoWrapperAPI.Clients
             return response.Data.Title;
         }
 
-        public string PostCategory (Nullable<long> category_id)
+        public string PostCategory(Nullable<long> category_id)
         {
             if (category_id == null)
             {
@@ -74,7 +80,7 @@ namespace PicartoWrapperAPI.Clients
             return response.Data.Category;
         }
 
-        public bool PostAdult (Nullable<bool> adultBool)
+        public bool PostAdult(Nullable<bool> adultBool)
         {
             if (adultBool == null)
             {
@@ -85,6 +91,5 @@ namespace PicartoWrapperAPI.Clients
             var response = restClient.Execute<Channel>(request);
             return response.Data.Adult;
         }
-
     }
 }

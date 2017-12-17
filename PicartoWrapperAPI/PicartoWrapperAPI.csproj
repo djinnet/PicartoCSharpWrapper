@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clients\PicartoAuthenticatedClient.cs" />
+    <Compile Include="Clients\PicartoFixedClient.cs" />
     <Compile Include="Clients\PicartoReadOnlyClient.cs" />
     <Compile Include="Enums\Account_type.cs" />
     <Compile Include="Enums\ChannelState.cs" />
