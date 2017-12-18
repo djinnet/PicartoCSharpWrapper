@@ -16,9 +16,9 @@ namespace PicartoWrapperAPI.Clients
         {
         }
 
-        public PicartoAuthenticatedClient(string clientId, string oauth) : base(clientId)
+        public PicartoAuthenticatedClient(string clientId, string token) : base(clientId)
         {
-            restClient.AddDefaultHeader("Authorization", String.Format("OAuth {0}", oauth));
+            restClient.AddDefaultHeader("Authorization", String.Format("Bearer {0}", token));
 
             var user = this.GetMyUser();
             if (user == null || String.IsNullOrWhiteSpace(user.Channel_details.Name))
