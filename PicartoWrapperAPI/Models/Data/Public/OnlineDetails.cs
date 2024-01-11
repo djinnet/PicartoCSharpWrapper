@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PicartoWrapperAPI.Enums;
+using System;
+using System.Collections.Generic;
 
 namespace PicartoWrapperAPI.Models
 {
@@ -57,7 +57,7 @@ namespace PicartoWrapperAPI.Models
         public List<DescriptionPanel> Description_panels { get; set; }
 
         [JsonProperty("private")]
-        public bool @private { get; set; }
+        public bool Private { get; set; }
 
 
         [JsonProperty("gaming")]

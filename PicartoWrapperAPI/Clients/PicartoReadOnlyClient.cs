@@ -1,19 +1,19 @@
-﻿using RestSharp;
-using PicartoWrapperAPI.Enums;
+﻿using PicartoWrapperAPI.Enums;
 using PicartoWrapperAPI.Helpers;
 using PicartoWrapperAPI.Models;
-using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace PicartoWrapperAPI.Clients
 {
     public class PicartoReadOnlyClient : IPicartoClient
     {
 
-        public readonly RestClient restClient;
+        public readonly HttpClient Client = new();
         public string Clientname;
         public int ClientID;
 
@@ -24,7 +24,7 @@ namespace PicartoWrapperAPI.Clients
         /// <param name="url"></param>
         public PicartoReadOnlyClient(string clientname = null, string url = PicartoHelper.picartoApiUrl)
         {
-            if (String.IsNullOrEmpty(clientname))
+            if (string.IsNullOrEmpty(clientname))
             {
                 throw new Exception("Clientname don't exist or it's empty!");
             }
@@ -32,17 +32,18 @@ namespace PicartoWrapperAPI.Clients
             {
                 Clientname = clientname;
             }
-
-            //Clientname = clientname;
-            restClient = new RestClient(url);
-            restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/x-json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/javascript", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("*+json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/html", PicartoJsonDeserializer.Default);
-            restClient.AddDefaultHeader("Client-name", clientname);
-
+            Client = new()
+            {
+                BaseAddress = new Uri(url)
+            };
+            Client.DefaultRequestHeaders.Accept.Clear();
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/x-json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/javascript"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*+json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
+            Client.DefaultRequestHeaders.Add("Client-name", clientname);
         }
 
         /// <summary>
@@ -60,15 +61,18 @@ namespace PicartoWrapperAPI.Clients
             {
                 ClientID = ID.Value;
             }
-
-            restClient = new RestClient(url);
-            restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/x-json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/javascript", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("*+json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/html", PicartoJsonDeserializer.Default);
-            restClient.AddDefaultHeader("Client-ID", ID.ToString());
+            Client = new()
+            {
+                BaseAddress = new Uri(url)
+            };
+            Client.DefaultRequestHeaders.Accept.Clear();
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/x-json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/javascript"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*+json"));
+            Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
+            Client.DefaultRequestHeaders.Add("Client-ID", ID.ToString());
 
         }
 
@@ -80,16 +84,10 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="ID">input</param>
         /// <returns>channel</returns>
-        public Channel GetIDChannel(Nullable<int> ID = null)
+        public async Task<Channel> GetIDChannelAsync(int? ID = null)
         {
-            if (ID == null)
-            {
-                ID = ClientID;
-            }
-            var request = GetRequest("channel/id/{ID}", Method.GET);
-            request.AddUrlSegment("ID", ID.ToString());
-            var response = restClient.Execute<Channel>(request);
-            return response.Data;
+            ID ??= ClientID;
+            return await Client.GetFromJsonAsync<Channel>($"channel/id/{ID}");
         }
 
 
@@ -97,22 +95,10 @@ namespace PicartoWrapperAPI.Clients
         /// Get Channel based on name from input
         /// </summary>
         /// <returns>Channel</returns>
-        public Channel GetNameChannel(string name = null)
+        public async Task<Channel> GetNameChannelAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-            }
-
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data;
+            name = CheckEmptyName(name);
+            return await Client.GetFromJsonAsync<Channel>($"channel/name/{name}");
         }
 
 
@@ -121,21 +107,11 @@ namespace PicartoWrapperAPI.Clients
         /// Get Account type from channel based on picarto read only name.
         /// </summary>
         /// <returns>Account_type</returns>
-        public Account_type GetAccountType(string name = null)
+        public async Task<Account_type> GetAccountTypeAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-            }
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Account_type;
+            name = CheckEmptyName(name);
+            var response = await GetNameChannelAsync(name);
+            return response.Account_type;
         }
 
 
@@ -143,7 +119,14 @@ namespace PicartoWrapperAPI.Clients
         /// Is channel Online
         /// </summary>
         /// <returns></returns>
-        public bool Live(string name = null)
+        public async Task<bool> LiveAsync(string name = null)
+        {
+            name = CheckEmptyName(name);
+            var response = await GetNameChannelAsync(name);
+            return response.Online;
+        }
+
+        private string CheckEmptyName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
@@ -153,70 +136,39 @@ namespace PicartoWrapperAPI.Clients
                 }
                 name = Clientname;
             }
-            
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Online;
+
+            return name;
         }
 
         /// <summary>
         /// Get Channel title 
         /// </summary>
         /// <returns>Title of the channel</returns>
-        public string GetChannelTitle(string name = null)
+        public async Task<string> GetChannelTitleAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                name = Clientname;
-            }
-
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Title;
+            name = CheckEmptyName(name);
+            var response = await GetNameChannelAsync(name);
+            return response.Title;
         }
 
         /// <summary>
         /// Get Channel video
         /// </summary>
         /// <returns>videos of the channel</returns>
-        public ChannelVideo GetChannelNameVideos(string name = null)
+        public async Task<ChannelVideo> GetChannelNameVideosAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                name = Clientname;
-            }
-
-            var request = GetRequest("channel/name/{name}/videos", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<ChannelVideo>(request);
-            return response.Data;
+            name = CheckEmptyName(name);
+            return await Client.GetFromJsonAsync<ChannelVideo>($"channel/name/{name}/videos");
         }
 
         /// <summary>
         /// Get Channel video
         /// </summary>
         /// <returns>videos of the channel</returns>
-        public ChannelVideo GetChannelIDVideos(Nullable<int> ID = null)
+        public async Task<ChannelVideo> GetChannelIDVideosAsync(Nullable<int> ID = null)
         {
-            if (ID == null)
-            {
-                ID = ClientID;
-            }
-
-            var request = GetRequest("channel/id/{id}/videos", Method.GET);
-            request.AddUrlSegment("id", ID.ToString());
-            var response = restClient.Execute<ChannelVideo>(request);
-            return response.Data;
+            ID ??= ClientID;
+            return await Client.GetFromJsonAsync<ChannelVideo>($"channel/id/{ID}/videos");
         }
 
         
@@ -226,23 +178,13 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">channel name</param>
         /// <returns>the user's avatar</returns>
-        public string GetUserAvatar(string name = null)
+        public async Task<string> GetUserAvatarAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-            }
+            name = CheckEmptyName(name);
 
             //var url = $"https://picarto.tv/user_data/usrimg/{name}/dsdefault.jpg";
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<BasicChannelInfo>(request);
-            return response.Data.Avatar;
+            var response = await GetNameChannelAsync(name);
+            return response.Avatar;
         }
 
 
@@ -251,21 +193,11 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">the name of the channel</param>
         /// <returns>a list of languages from the channel</returns>
-        public List<Language> GetChannelLanguages(string name = null)
+        public async Task<List<Language>> GetChannelLanguagesAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-                }
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Languages>(request);
-            return response.Data.ListofLanguages;
+            name = CheckEmptyName(name);
+            var response = await GetNameChannelAsync(name);
+            return response.Languages;
         }
 
         /// <summary>
@@ -275,24 +207,15 @@ namespace PicartoWrapperAPI.Clients
         /// <param name="gaming">gaming is false in default</param>
         /// <param name="category">category is empty in default</param>
         /// <returns>a list over online channels</returns>
-        public List<OnlineDetails> GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
+        public async Task<List<OnlineDetails>> GetOnlineChannelsAsync(bool adult = false, bool gaming = false, string category = null)
         {
-            var request = GetRequest("online?adult={adult}&gaming={gaming}&categories={strings}", Method.GET);
-            request.AddUrlSegment("adult", adult.ToString());
-            request.AddUrlSegment("gaming", gaming.ToString());
             if (string.IsNullOrEmpty(category))
             {
                 category = "";
-                request.AddUrlSegment("strings", category);
             }
-            else
-            {
-                request.AddUrlSegment("strings", category);
-            }
-            
-            request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<OnlineChannels>(request);
-            return response.Data.OnlineDetails;
+
+            var response = await Client.GetFromJsonAsync<OnlineChannels>($"online?adult={adult}&gaming={gaming}&categories={category}");
+            return response.OnlineDetails;
         }
 
         /// <summary>
@@ -300,20 +223,10 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">Username</param>
         /// <returns>thumbnail</returns>
-        public Thumbnail GetThumbnail(string name = null){
-           if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-                }
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Thumbnail;
+        public async Task<Thumbnail> GetThumbnailAsync(string name = null){
+            name = CheckEmptyName(name);
+            var response = await GetNameChannelAsync(name);
+            return response.Thumbnail;
         } 
         
         /// <summary>
@@ -323,17 +236,7 @@ namespace PicartoWrapperAPI.Clients
         /// <returns>url to the chat</returns>
         public string GetPopOutChat(string name = null)
         {
-            
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-                
-            }
+            name = CheckEmptyName(name);
             string url = $"https://picarto.tv/chatpopout/{name}/public";
             return url;
         }
@@ -342,35 +245,19 @@ namespace PicartoWrapperAPI.Clients
         /// Get Online catagories
         /// </summary>
         /// <returns>list over online catagories</returns>
-        public Categories GetOnlineCategories()
+        public async Task<Categories> GetOnlineCategoriesAsync()
         {
-            var request = GetRequest("categories", Method.GET);
-            request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<Categories>(request);
-            return response.Data;
+            return await Client.GetFromJsonAsync<Categories>($"categories");
         }
 
         /// <summary>
         /// get Online events
         /// </summary>
         /// <returns>list over online events</returns>
-        public Events GetOnlineEvents()
+        public async Task<Events> GetOnlineEventsAsync()
         {
-            var request = GetRequest("events", Method.GET);
-            request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<Events>(request);
-            return response.Data;
-        }
-
-        /// <summary>
-        /// Fetch an request 
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="method"></param>
-        /// <returns>Restrequest variable</returns>
-        public RestRequest GetRequest(string url, Method method)
-        {
-            return new RestRequest(url, method);
+            return await Client.GetFromJsonAsync<Events>($"events");
+            
         }
     }
 }

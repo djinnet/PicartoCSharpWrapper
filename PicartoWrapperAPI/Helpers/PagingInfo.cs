@@ -8,19 +8,19 @@ namespace PicartoWrapperAPI.Helpers
 
         public PagingInfo()
         {
-            page = 1;
+            Page = 1;
             PageSize = 25;
             ViewAll = false;
         }
 
         protected PagingInfo(PagingInfo pagingInfo)
         {
-            page = pagingInfo.page;
+            Page = pagingInfo.Page;
             PageSize = pagingInfo.PageSize;
             ViewAll = pagingInfo.ViewAll;
         }
 
-        public int page { get; set; }
+        public int Page { get; set; }
 
         public bool ViewAll { get; set; }
 
@@ -33,7 +33,7 @@ namespace PicartoWrapperAPI.Helpers
 
         public int Skip
         {
-            get { return (page - 1) * PageSize; }
+            get { return (Page - 1) * PageSize; }
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using RestSharp;
-using RestSharp.Deserializers;
-
-
-
-namespace PicartoWrapperAPI
+﻿namespace PicartoWrapperAPI
 {
     public class PicartoConnection
     {

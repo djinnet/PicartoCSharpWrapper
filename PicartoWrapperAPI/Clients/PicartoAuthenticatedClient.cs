@@ -1,95 +1,33 @@
 ﻿using System;
-using RestSharp;
-using PicartoWrapperAPI.Enums;
-using PicartoWrapperAPI.Helpers;
 using PicartoWrapperAPI.Models;
 using System.Collections.Generic;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace PicartoWrapperAPI.Clients
 {
-    //todo: Remember to test if this client works.
+    //todo: rework this so this can be used in the test project
     public class PicartoAuthenticatedClient : PicartoReadOnlyClient, IPicartoClient
     {
-        private readonly string username;
-
-        protected PicartoAuthenticatedClient(string clientId) : base(clientId)
-        {
-        }
-
         public PicartoAuthenticatedClient(string clientId, string token) : base(clientId)
         {
-            restClient.AddDefaultHeader("Authorization", String.Format("Bearer {0}", token));
-
-            var user = this.GetMyUser();
-            if (user == null || String.IsNullOrWhiteSpace(user.Channel_details.Name))
-            {
-                throw new PicartoExeption("Couldn't get the user name!");
-            }
-            this.username = user.Channel_details.Name;
+            Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Authorization", String.Format("Bearer {0}", token));
+            
         }
 
-        public UserData GetMyUser()
+        public async Task<UserData> GetMyUserAsync()
         {
-            var request = GetRequest("user", Method.GET);
-            var response = restClient.Execute<UserData>(request);
-            return response.Data;
+            return await Client.GetFromJsonAsync<UserData>($"user");
         }
 
-        public List<BasicChannelInfo> GetFollowing()
+        public async Task<List<Channel>> GetFollowingAsync()
         {
-            var request = GetRequest("user/following", Method.GET);
-            var response = restClient.Execute<List<BasicChannelInfo>>(request);
-            return response.Data;
+            return await Client.GetFromJsonAsync<List<Channel>>($"user/following");
         }
 
-        public string GetStreamkey()
+        public async Task<string> GetStreamkeyAsync()
         {
-            var request = GetRequest("user/streamkey", Method.GET);
-            var response = restClient.Execute<Streamkey>(request);
-            return response.Data.StreamkeyToken;
-        }
-
-        public string GetBotJWTtoken()
-        {
-            var request = GetRequest("user/following", Method.GET);
-            var response = restClient.Execute<Bot>(request);
-            return response.Data.Jwtkey;
-        }
-
-        public string PostTitle(string newtitle = null)
-        {
-            if (String.IsNullOrEmpty(newtitle))
-            {
-                throw new Exception(newtitle + " cannot be null or empty!");
-            }
-
-            var request = GetRequest("user/title", Method.GET);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Title;
-        }
-
-        public string PostCategory(Nullable<long> category_id)
-        {
-            if (category_id == null)
-            {
-                throw new Exception(category_id + " cannot be null or empty!");
-            }
-
-            var request = GetRequest("user/category", Method.GET);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Category;
-        }
-
-        public bool PostAdult(Nullable<bool> adultBool)
-        {
-            if (adultBool == null)
-            {
-                throw new Exception(adultBool + " cannot be null or empty!");
-            }
-
-            var request = GetRequest("user/adult", Method.GET);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Adult;
+            return (await Client.GetFromJsonAsync<Streamkey>($"user/streamkey")).StreamkeyToken;
         }
     }
 }
