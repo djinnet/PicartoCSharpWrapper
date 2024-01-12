@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{2933E963-761C-4314-9C08-95FD16FC2A2A}</ProjectGuid>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyTitle>PicartoWrapperAPI</AssemblyTitle>
     <Product>PicartoWrapperAPI</Product>
     <Copyright>Copyright ©  2023</Copyright>

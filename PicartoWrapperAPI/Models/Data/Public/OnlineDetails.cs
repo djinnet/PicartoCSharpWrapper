@@ -75,7 +75,7 @@ namespace PicartoWrapperAPI.Models
         public List<string> Tags { get; set; }
 
         [JsonProperty("multistream")]
-        public List<Multistream> Multistream { get; set; }
+        public List<ChannelMultistream> Multistream { get; set; }
 
         [JsonProperty("languages")]
         public List<Language> Languages { get; set; }

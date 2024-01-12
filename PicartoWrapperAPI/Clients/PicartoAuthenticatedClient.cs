@@ -9,7 +9,7 @@ namespace PicartoWrapperAPI.Clients
     //todo: rework this so this can be used in the test project
     public class PicartoAuthenticatedClient : PicartoReadOnlyClient, IPicartoClient
     {
-        public PicartoAuthenticatedClient(string clientId, string token) : base(clientId)
+        public PicartoAuthenticatedClient(string clientId, string token) : base()
         {
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Authorization", String.Format("Bearer {0}", token));
             
@@ -20,9 +20,9 @@ namespace PicartoWrapperAPI.Clients
             return await Client.GetFromJsonAsync<UserData>($"user");
         }
 
-        public async Task<List<Channel>> GetFollowingAsync()
+        public async Task<List<ChannelDetails>> GetFollowingAsync()
         {
-            return await Client.GetFromJsonAsync<List<Channel>>($"user/following");
+            return await Client.GetFromJsonAsync<List<ChannelDetails>>($"user/following");
         }
 
         public async Task<string> GetStreamkeyAsync()

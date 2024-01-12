@@ -1,8 +1,18 @@
-﻿namespace PicartoWrapperAPI.Models
+﻿namespace PicartoWrapperAPI.Models;
+
+/// <summary>
+/// A language
+/// </summary>
+public class Language
 {
-    public class Language
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    /// <summary>
+    /// The language ID
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
+    /// The human-readable name of the language
+    /// </summary>
+    public string Name { get; set; }
 }
+

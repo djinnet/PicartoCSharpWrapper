@@ -3,8 +3,8 @@
     public enum Account_type
     {
         
-        free,
-        premium,
-        basic
+        free = 0,
+        basic = 1,
+        premium = 2
     }
 }
