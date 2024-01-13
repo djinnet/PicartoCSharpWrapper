@@ -9,15 +9,8 @@ using System.Threading.Tasks;
 
 namespace PicartoWrapperAPI.Clients
 {
-    public class PicartoReadOnlyClient : BasePicartoClient
+    public class PicartoReadOnlyClient(string token = null) : BasePicartoClient(token)
     {
-        
-        public PicartoReadOnlyClient()
-        {
-
-        }
-
-
         #region Categories
 
         /// <summary>

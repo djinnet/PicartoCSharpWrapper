@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PicartoWrapperAPI.Helpers;
 using System;
 using System.Net;
@@ -18,13 +19,23 @@ public class BasePicartoClient : IPicartoClient
         get { return PicartoHelper.BaseUrl; }
     }
 
-    public BasePicartoClient()
+    public BasePicartoClient(string authToken = null)
     {
         httpClient = new()
         {
             BaseAddress = new Uri(BaseUrl)
         };
+        AddHeaders();
 
+        // Set authorization token if provided
+        if (!string.IsNullOrEmpty(authToken))
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Authorization", string.Format("Bearer {0}", authToken));
+        }
+    }
+
+    private void AddHeaders()
+    {
         httpClient.DefaultRequestHeaders.Accept.Clear();
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/json"));
@@ -32,7 +43,6 @@ public class BasePicartoClient : IPicartoClient
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/javascript"));
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*+json"));
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
-        
     }
 
     public void AddClientNameToHeader(string clientname) => httpClient.DefaultRequestHeaders.Add("Client-name", clientname);
