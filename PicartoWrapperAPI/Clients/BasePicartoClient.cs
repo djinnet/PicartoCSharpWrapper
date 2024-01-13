@@ -44,6 +44,12 @@ public class BasePicartoClient : IPicartoClient
         return await HandleResponse<TResponse>(response);
     }
 
+    public async Task<TResponse> PostAsync<TResponse>(string requestUri, HttpContent content = null, CancellationToken cancellationToken = default)
+    {
+        HttpResponseMessage response = await httpClient.PostAsync(requestUri, null, cancellationToken);
+        return await HandleResponse<TResponse>(response);
+    }
+
     public async Task<TResponse> PostAsync<TRequest, TResponse>(string requestUri, TRequest requestData, CancellationToken cancellationToken = default)
     {
         string jsonContent = JsonConvert.SerializeObject(requestData);

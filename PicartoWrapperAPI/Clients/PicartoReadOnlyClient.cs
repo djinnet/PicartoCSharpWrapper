@@ -1,6 +1,9 @@
-﻿using PicartoWrapperAPI.Models;
+﻿using Newtonsoft.Json;
+using PicartoWrapperAPI.Models;
+using PicartoWrapperAPI.Models.Data.Chat;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -229,15 +232,13 @@ namespace PicartoWrapperAPI.Clients
         #endregion
 
         #region Nofifications
+
         /// <summary>
-        /// Get stream
+        /// Get all global notifications/announcements
         /// </summary>
-        /// <param name="channel_id">Channel Id</param>
-        /// <returns>A successful query, got stream</returns>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
+        /// <returns>A successful query, got global notifications</returns>
         public async Task<List<Notifications>> NotificationsAsync()
         {
-
             StringBuilder urlBuilder_ = new();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/notifications");
             string url_ = urlBuilder_.ToString();
@@ -246,7 +247,131 @@ namespace PicartoWrapperAPI.Clients
 
         #endregion
 
+        #region ChatSetting
 
+        /// <summary>
+        /// Get all chat settings
+        /// </summary>
+        /// <returns>Successfully got all chat settings</returns>
+        public async Task<DisplayChatSetting> GetChatSettingsAsync()
+        {
+
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<DisplayChatSetting>(url_);
+        }
+
+        /// <summary>
+        /// Update the chat display style setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsDisplaystyleAsync(ValueBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/displaystyle");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<ValueBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Update the chat whispers setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsWhispersAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/whispers");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Update the chat emotes setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsEmotesAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/emotes");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Update the chat sounds setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task<object> PostChatSettingsSoundsAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/sounds");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+
+        /// <summary>
+        /// Update the chat timestamps setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsTimestampsAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/timestamps");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Get the current email settings
+        /// </summary>
+        /// <returns>Got current email settings</returns>
+        public async Task<EmailSettings> GetEmailsAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<EmailSettings>(url_);
+        }
+
+        /// <summary>
+        /// Toggle newsletter emails
+        /// </summary>
+        /// <returns>Enabled/disabled newsletter emails</returns>
+        public async Task PostEmailsNewsletterAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/newsletter");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Toggle stream online emails
+        /// </summary>
+        /// <returns>Enabled/disabled newsletter emails</returns>
+        public async Task<object> PostEmailsOnlineAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/online");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+        #endregion
 
         #region Misc
 
