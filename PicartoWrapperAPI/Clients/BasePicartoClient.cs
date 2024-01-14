@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PicartoWrapperAPI.Helpers;
 using System;
 using System.Net;

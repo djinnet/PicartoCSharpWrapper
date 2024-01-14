@@ -238,6 +238,32 @@ namespace PicartoWrapperAPI.Clients
             return await GetAsync<List<Notifications>>(url_);
         }
 
+        /// <summary>
+        /// Get this user’s notifications
+        /// </summary>
+        /// <returns>Got notifications</returns>
+        public async Task<List<GetUserNotification>> GetNotificationsAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/notifications");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<GetUserNotification>>(url_);
+        }
+
+        /// <summary>
+        /// Mark this notification as read
+        /// </summary>
+        /// <param name="uuid">UUID of the notification you wish to read</param>
+        /// <returns>Marked this notifications as read</returns>
+        public async Task PostNotificationsReadAsync(Guid uuid)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/notifications/{uuid}/read");
+            urlBuilder_.Replace("{uuid}", Uri.EscapeDataString(ConvertToString(uuid, System.Globalization.CultureInfo.InvariantCulture)));
+            string url_ = urlBuilder_.ToString();
+            await PostAsync(url_);
+        }
+
         #endregion
 
         #region ChatSetting
@@ -363,6 +389,169 @@ namespace PicartoWrapperAPI.Clients
             var urlBuilder_ = new StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/online");
             return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+        /// <summary>
+        /// Toggle new follower emails
+        /// </summary>
+        /// <returns>Enabled/disabled follower emails</returns>
+        public async Task PostEmailsFollowersAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/follower");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Get state of mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off all notifications</returns>
+        public async Task<MobileNotify> GetMobilenotifyAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<MobileNotify>(url_);
+        }
+
+        /// <summary>
+        /// Enable/disable all mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off all notifications</returns>
+        public async Task PostMobilenotifyAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Enable/disable follow mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off follow notifications</returns>
+        public async Task<object> PostMobilenotifyFollowAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify/follow");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+        /// <summary>
+        /// Enable/disable live mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off live notifications</returns>
+        public async Task PostMobilenotifyLiveAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify/live");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Enable/disable subscribe notifications
+        /// </summary>
+        /// <returns>Switched on/off subscribe notifications</returns>
+        public async Task<object> PostMobilenotifySubscribeAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify/subscribe");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+        //To-do: Check if GetMobileSettingsAdultAsync need a value return
+        /// <summary>
+        /// Check if a user can see adult content in-app
+        /// </summary>
+        /// <returns>Query successful, got adult app state</returns>
+        public async Task GetMobileSettingsAdultAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilesettings/adult");
+            string url_ = urlBuilder_.ToString();
+            await GetAsync(url_);
+        }
+
+        /// <summary>
+        /// Enable/disable adult content in-app
+        /// </summary>
+        /// <returns>Successfully updated user adult mobile setting</returns>
+        public async Task<object> PostMobileSettingsAdultAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilesettings/adult");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+
+        /// <summary>
+        /// Get information about the currently running multistream
+        /// </summary>
+        /// <returns>Get current multistream session/invites</returns>
+        public async Task<UserMultistream> GetUserMultistreamAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/multistream");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<UserMultistream>(url_);
+        }
+
+        /// <summary>
+        /// Invite a user to a multistream
+        /// </summary>
+        /// <returns>User invited to multistream</returns>
+        public async Task PostUserMultistreamInviteAsync(ChannelIDBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/multistream/invite");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<ChannelIDBody>(urlBuilder_.ToString(), content);
+        }
+
+        //To-Do: Implemented this
+        /// <summary>
+        /// Accept a multistream invite
+        /// </summary>
+        /// <returns>Accepted the multistream</returns>
+        public async Task<object> PostUserMultistreamAcceptAsync(ChannelIDBody body)
+        {
+            string url = "/user/multistream/accept";
+            throw new NotImplementedException();
+        }
+
+        //To-Do: Implemented this
+        /// <summary>
+        /// Remove someone from your multistream
+        /// </summary>
+        /// <returns>Removed this channel from the multistream</returns>
+        public Task<object> PostUserMultistreamRemoveAsync(ChannelIDBody body)
+        {
+            string url = "/user/multistream/remove";
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Decline a multistream invite/leave a multistream you were invited to
+        /// </summary>
+        /// <returns>Declined/left the multistream</returns>
+        public Task<object> PostUserMultistreamDeclineAsync(ChannelIDBody body)
+        {
+            string url = "/user/multistream/decline";
+            throw new NotImplementedException();
         }
         #endregion
 
