@@ -1,4 +1,4 @@
-﻿namespace PicartoWrapperAPI.Models;
+﻿namespace PicartoWrapperAPI.Models.Data.Public;
 
 public class Categories
 {

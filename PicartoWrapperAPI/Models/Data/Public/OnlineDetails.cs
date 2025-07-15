@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PicartoWrapperAPI.Enums;
+using PicartoWrapperAPI.Models.Data.Channel;
+using PicartoWrapperAPI.Models.Data.Languages;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +31,7 @@ namespace PicartoWrapperAPI.Models
         public int Viewers_total { get; set; }
 
         [JsonProperty("thumbnail")]
-        public Thumbnail Thumbnails { get; set; }
+        public Thumbnails Thumbnails { get; set; }
 
         [JsonProperty("followers")]
         public int Followers { get; set; }

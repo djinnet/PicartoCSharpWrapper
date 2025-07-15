@@ -47,6 +47,35 @@ public class BasePicartoClient : IPicartoClient
     public void AddClientNameToHeader(string clientname) => httpClient.DefaultRequestHeaders.Add("Client-name", clientname);
     public void AddClientIDToHeader(string clientname) => httpClient.DefaultRequestHeaders.Add("Client-ID", clientname);
 
+    public async Task<bool> PostAsync(string requestUri, HttpContent content = null, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            HttpResponseMessage response = await httpClient.PostAsync(requestUri, null, cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception)
+        {
+            // Log the exception or handle it as needed
+            // For now, we just return false to indicate failure
+            return false;
+        }
+    }
+
+    public async Task<bool> GetAsync(string requestUri, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            HttpResponseMessage response = await httpClient.GetAsync(requestUri, cancellationToken);
+            
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
+
     public async Task<TResponse> GetAsync<TResponse>(string requestUri, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response = await httpClient.GetAsync(requestUri, cancellationToken);
@@ -67,6 +96,8 @@ public class BasePicartoClient : IPicartoClient
         HttpResponseMessage response = await httpClient.PostAsync(requestUri, content, cancellationToken);
         return await HandleResponse<TResponse>(response);
     }
+
+    
 
     private async Task<TResponse> HandleResponse<TResponse>(HttpResponseMessage response)
     {

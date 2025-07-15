@@ -1,4 +1,4 @@
-﻿namespace PicartoWrapperAPI.Models;
+﻿namespace PicartoWrapperAPI.Models.Body;
 public class StreamBody
 {
   public StreamChannel Channel { get; set; }

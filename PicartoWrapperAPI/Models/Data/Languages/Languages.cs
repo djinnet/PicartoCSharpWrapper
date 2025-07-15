@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PicartoWrapperAPI.Models
+namespace PicartoWrapperAPI.Models.Data.Languages
 {
     public class Languages
     {

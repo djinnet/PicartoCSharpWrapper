@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PicartoWrapperAPI.Enums;
+using PicartoWrapperAPI.Models.Data.Channel;
 using PicartoWrapperAPI.Models.Data.Chat;
+using PicartoWrapperAPI.Models.Data.Languages;
 using System;
 using System.Collections.Generic;
 
@@ -45,7 +47,7 @@ public class ChannelDetails
     /// <summary>
     /// The thumbnail for the channel
     /// </summary>
-    public Thumbnail Thumbnail { get; set; }
+    public Thumbnails Thumbnail { get; set; }
 
     /// <summary>
     /// The total number of people following this streamer

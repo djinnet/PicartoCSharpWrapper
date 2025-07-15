@@ -1,4 +1,4 @@
-﻿namespace PicartoWrapperAPI.Models;
+﻿namespace PicartoWrapperAPI.Models.Data.Languages;
 
 /// <summary>
 /// A language

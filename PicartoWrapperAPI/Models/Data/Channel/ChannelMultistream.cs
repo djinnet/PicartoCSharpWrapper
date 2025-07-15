@@ -1,4 +1,4 @@
-﻿namespace PicartoWrapperAPI.Models;
+﻿namespace PicartoWrapperAPI.Models.Data.Channel;
 
 /// <summary>
 /// channel multistream

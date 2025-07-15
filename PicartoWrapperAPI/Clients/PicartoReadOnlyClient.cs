@@ -1,6 +1,11 @@
 ﻿using Newtonsoft.Json;
 using PicartoWrapperAPI.Models;
+using PicartoWrapperAPI.Models.Body;
 using PicartoWrapperAPI.Models.Data.Chat;
+using PicartoWrapperAPI.Models.Data.Languages;
+using PicartoWrapperAPI.Models.Data.Notifications;
+using PicartoWrapperAPI.Models.Data.Public;
+using PicartoWrapperAPI.Models.Data.User;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -255,13 +260,13 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="uuid">UUID of the notification you wish to read</param>
         /// <returns>Marked this notifications as read</returns>
-        public async Task PostNotificationsReadAsync(Guid uuid)
+        public async Task<bool> PostNotificationsReadAsync(Guid uuid)
         {
             var urlBuilder_ = new StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/notifications/{uuid}/read");
             urlBuilder_.Replace("{uuid}", Uri.EscapeDataString(ConvertToString(uuid, System.Globalization.CultureInfo.InvariantCulture)));
             string url_ = urlBuilder_.ToString();
-            await PostAsync(url_);
+            return await PostAsync(url_);
         }
 
         #endregion
@@ -470,17 +475,16 @@ namespace PicartoWrapperAPI.Clients
             return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
         }
 
-        //To-do: Check if GetMobileSettingsAdultAsync need a value return
         /// <summary>
         /// Check if a user can see adult content in-app
         /// </summary>
         /// <returns>Query successful, got adult app state</returns>
-        public async Task GetMobileSettingsAdultAsync()
+        public async Task<bool> GetMobileSettingsAdultAsync()
         {
             StringBuilder urlBuilder_ = new();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilesettings/adult");
             string url_ = urlBuilder_.ToString();
-            await GetAsync(url_);
+            return await GetAsync(url_);
         }
 
         /// <summary>
@@ -601,7 +605,7 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">Username</param>
         /// <returns>thumbnail</returns>
-        public async Task<Thumbnail> GetThumbnailAsync(string name = null){
+        public async Task<Thumbnails> GetThumbnailAsync(string name = null){
             var response = await ShowChannelByNameAsync(name);
             return response.Thumbnail;
         } 

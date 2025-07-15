@@ -1,4 +1,4 @@
-﻿namespace PicartoWrapperAPI.Models;
+﻿namespace PicartoWrapperAPI.Models.Data.Notifications;
 public class Notifications
 {
     /// <summary>
