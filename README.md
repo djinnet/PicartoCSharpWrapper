@@ -4,7 +4,7 @@
 ## Documentation
 This project is a wrapper for picarto API, so that you can interact with it using C#.
 Most of the methods, functions, models and etc are named after their api from picarto.
-The Picarto API is documented [here](https://docs.picarto.tv/api/).
+The Picarto API is documented [here](https://api.picarto.tv/).
 
 # Installation
 ## NuGet installation:

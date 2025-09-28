@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using PicartoWrapperAPI.Enums;
+using PicartoWrapperAPI.Models.Data.Channel;
+using PicartoWrapperAPI.Models.Data.Languages;
+using System;
+using System.Collections.Generic;
 
 namespace PicartoWrapperAPI.Models
 {
@@ -29,7 +31,7 @@ namespace PicartoWrapperAPI.Models
         public int Viewers_total { get; set; }
 
         [JsonProperty("thumbnail")]
-        public Thumbnail Thumbnails { get; set; }
+        public Thumbnails Thumbnails { get; set; }
 
         [JsonProperty("followers")]
         public int Followers { get; set; }
@@ -57,7 +59,7 @@ namespace PicartoWrapperAPI.Models
         public List<DescriptionPanel> Description_panels { get; set; }
 
         [JsonProperty("private")]
-        public bool @private { get; set; }
+        public bool Private { get; set; }
 
 
         [JsonProperty("gaming")]
@@ -75,7 +77,7 @@ namespace PicartoWrapperAPI.Models
         public List<string> Tags { get; set; }
 
         [JsonProperty("multistream")]
-        public List<Multistream> Multistream { get; set; }
+        public List<ChannelMultistream> Multistream { get; set; }
 
         [JsonProperty("languages")]
         public List<Language> Languages { get; set; }

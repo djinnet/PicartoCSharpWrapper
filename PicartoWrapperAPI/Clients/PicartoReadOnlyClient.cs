@@ -1,248 +1,591 @@
-﻿using RestSharp;
-using PicartoWrapperAPI.Enums;
-using PicartoWrapperAPI.Helpers;
+﻿using Newtonsoft.Json;
 using PicartoWrapperAPI.Models;
-using System.Threading.Tasks;
-using System.Net.Http;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+using PicartoWrapperAPI.Models.Body;
+using PicartoWrapperAPI.Models.Data.Chat;
+using PicartoWrapperAPI.Models.Data.Languages;
+using PicartoWrapperAPI.Models.Data.Notifications;
+using PicartoWrapperAPI.Models.Data.Public;
+using PicartoWrapperAPI.Models.Data.User;
 using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PicartoWrapperAPI.Clients
 {
-    public class PicartoReadOnlyClient : IPicartoClient
+    public class PicartoReadOnlyClient(string token = null) : BasePicartoClient(token)
     {
-
-        public readonly RestClient restClient;
-        public string Clientname;
-        public int ClientID;
+        #region Categories
 
         /// <summary>
-        /// Picarto read only name based.
+        /// Get information about all categories
         /// </summary>
-        /// <param name="clientname"></param>
-        /// <param name="url"></param>
-        public PicartoReadOnlyClient(string clientname = null, string url = PicartoHelper.picartoApiUrl)
+        /// <returns>A successful query, got all categories</returns>
+        public async Task<List<Categories>> CategoriesAsync()
         {
-            if (String.IsNullOrEmpty(clientname))
-            {
-                throw new Exception("Clientname don't exist or it's empty!");
-            }
-            else
-            {
-                Clientname = clientname;
-            }
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/categories");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<Categories>>(url_);
+        }
 
-            //Clientname = clientname;
-            restClient = new RestClient(url);
-            restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/x-json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/javascript", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("*+json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/html", PicartoJsonDeserializer.Default);
-            restClient.AddDefaultHeader("Client-name", clientname);
+        #endregion
 
+        #region Channel
+
+        /// <summary>
+        /// Gets information about a channel by name - providing a bearer token with permission readpub can get followed status in result
+        /// </summary>
+        /// <param name="channel_name">Channel name of user you wish to read</param>
+        /// <returns>A successful query, channel exists</returns>
+        public async Task<ChannelDetails> ShowChannelByNameAsync(string channel_name)
+        {
+            ArgumentNullException.ThrowIfNull(channel_name);
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/channel/name/{channel_name}");
+            urlBuilder_.Replace("{channel_name}", Uri.EscapeDataString(ConvertToString(channel_name, System.Globalization.CultureInfo.InvariantCulture)));
+
+            return await GetAsync<ChannelDetails>(urlBuilder_.ToString());
         }
 
         /// <summary>
-        /// Picarto read only ID based.
+        /// Get all videos for a channel by id
         /// </summary>
-        /// <param name="ID"></param>
-        /// <param name="url"></param>
-        public PicartoReadOnlyClient(Nullable<int> ID = null, string url = PicartoHelper.picartoApiUrl)
+        /// <param name="channel_id">The id of the application to retrieve</param>
+        /// <returns>A successful query, got videos</returns>
+        public async Task<ChannelDetails> ShowChannelByIdAsync(long channel_id)
         {
-            if (ID == null)
-            {
-                throw new Exception("ClientID don't exist or it's empty!");
-            }
-            else
-            {
-                ClientID = ID.Value;
-            }
+            ArgumentNullException.ThrowIfNull(channel_id);
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/channel/id/{channel_id}");
+            urlBuilder_.Replace("{channel_id}", Uri.EscapeDataString(ConvertToString(channel_id, System.Globalization.CultureInfo.InvariantCulture)));
 
-            restClient = new RestClient(url);
-            restClient.AddHandler("application/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/x-json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/javascript", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("*+json", PicartoJsonDeserializer.Default);
-            restClient.AddHandler("text/html", PicartoJsonDeserializer.Default);
-            restClient.AddDefaultHeader("Client-ID", ID.ToString());
-
-        }
-
-        
-        
-
-        /// <summary>
-        /// Get Channel based on ID from input
-        /// </summary>
-        /// <param name="ID">input</param>
-        /// <returns>channel</returns>
-        public Channel GetIDChannel(Nullable<int> ID = null)
-        {
-            if (ID == null)
-            {
-                ID = ClientID;
-            }
-            var request = GetRequest("channel/id/{ID}", Method.GET);
-            request.AddUrlSegment("ID", ID.ToString());
-            var response = restClient.Execute<Channel>(request);
-            return response.Data;
-        }
-
-
-        /// <summary>
-        /// Get Channel based on name from input
-        /// </summary>
-        /// <returns>Channel</returns>
-        public Channel GetNameChannel(string name = null)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-            }
-
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data;
-        }
-
-
-
-        /// <summary>
-        /// Get Account type from channel based on picarto read only name.
-        /// </summary>
-        /// <returns>Account_type</returns>
-        public Account_type GetAccountType(string name = null)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-            }
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Account_type;
-        }
-
-
-        /// <summary>
-        /// Is channel Online
-        /// </summary>
-        /// <returns></returns>
-        public bool Live(string name = null)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                name = Clientname;
-            }
-            
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Online;
+            return await GetAsync<ChannelDetails>(urlBuilder_.ToString());
         }
 
         /// <summary>
-        /// Get Channel title 
+        /// Get all videos for a channel by id
         /// </summary>
-        /// <returns>Title of the channel</returns>
-        public string GetChannelTitle(string name = null)
+        /// <param name="channel_id">Channel id of user you wish to read</param>
+        /// <returns>A successful query, got videos</returns>
+        public async Task<List<ChannelVideo>> GetChannelVideosByChannelIdAsync(long channel_id)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                name = Clientname;
-            }
+            ArgumentNullException.ThrowIfNull(channel_id);
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/channel/id/{channel_id}/videos");
+            urlBuilder_.Replace("{channel_id}", Uri.EscapeDataString(ConvertToString(channel_id, System.Globalization.CultureInfo.InvariantCulture)));
 
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Title;
+            return await GetAsync<List<ChannelVideo>>(urlBuilder_.ToString());
         }
 
         /// <summary>
         /// Get Channel video
         /// </summary>
         /// <returns>videos of the channel</returns>
-        public ChannelVideo GetChannelNameVideos(string name = null)
+        public async Task<List<ChannelVideo>> GetChannelVideosByChannelNameAsync(string channel_name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                name = Clientname;
-            }
+            ArgumentNullException.ThrowIfNull(channel_name);
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/channel/name/{channel_name}/videos");
+            urlBuilder_.Replace("{channel_name}", Uri.EscapeDataString(ConvertToString(channel_name, System.Globalization.CultureInfo.InvariantCulture)));
 
-            var request = GetRequest("channel/name/{name}/videos", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<ChannelVideo>(request);
-            return response.Data;
+            return await GetAsync<List<ChannelVideo>>(urlBuilder_.ToString());
         }
 
         /// <summary>
-        /// Get Channel video
+        /// Gets all currently online channels - providing a bearer token with permission readpub can get followed status in result
         /// </summary>
-        /// <returns>videos of the channel</returns>
-        public ChannelVideo GetChannelIDVideos(Nullable<int> ID = null)
+        /// <param name="adult">Whether or not to include adult channels (defaults to `false`)</param>
+        /// <param name="gaming">Whether or not to include gaming channels (defaults to `false`)</param>
+        /// <param name="category">What categories to limit this to (blank/not included doesn't filter) - seperate multiple categories by a `,` character</param>
+        /// <returns>A successful query, got all online channels</returns>
+        public async Task<List<OnlineDetails>> GetAllOnlineChannelsAsync(bool? adult, bool? gaming, object category)
         {
-            if (ID == null)
+            StringBuilder urlBuilder_ = new ();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/online?");
+            if (adult != null)
             {
-                ID = ClientID;
+                urlBuilder_.Append(Uri.EscapeDataString("adult") + "=").Append(Uri.EscapeDataString(ConvertToString(adult, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
             }
-
-            var request = GetRequest("channel/id/{id}/videos", Method.GET);
-            request.AddUrlSegment("id", ID.ToString());
-            var response = restClient.Execute<ChannelVideo>(request);
-            return response.Data;
+            if (gaming != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("gaming") + "=").Append(Uri.EscapeDataString(ConvertToString(gaming, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (category != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("category") + "=").Append(Uri.EscapeDataString(ConvertToString(category, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<OnlineDetails>>(url_);
         }
 
-        
+        /// <summary>
+        /// Get all channels matching the given search criteria (by name and tags)
+        /// </summary>
+        /// <param name="q">The search query to use (does not currently support special qualifiers)</param>
+        /// <param name="adult">Whether or not to include adult channels (defaults to `false`)</param>
+        /// <param name="page">The page to display (defaults to `1`)</param>
+        /// <param name="commissions">Whether or not to filter by streams offering commissions</param>
+        /// <returns>A successful query, got channels</returns>
+        public async Task<List<SearchChannel>> SearchAllChannelMatchingCriteriaAsync(string q, bool? adult, long? page, bool? commissions)
+        {
+            ArgumentNullException.ThrowIfNull(q);
+
+            StringBuilder urlBuilder_ = new ();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/search/channels?");
+            urlBuilder_.Append(Uri.EscapeDataString("q") + "=").Append(Uri.EscapeDataString(ConvertToString(q, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            if (adult != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("adult") + "=").Append(Uri.EscapeDataString(ConvertToString(adult, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (page != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("page") + "=").Append(Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (commissions != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("commissions") + "=").Append(Uri.EscapeDataString(ConvertToString(commissions, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<SearchChannel>>(url_);
+        }
+
+        /// <summary>
+        /// Get all channels matching the given search criteria (by name and tags)
+        /// </summary>
+        /// <param name="q">The search query to use (does not currently support special qualifiers)</param>
+        /// <param name="adult">Whether or not to include adult channels (defaults to `false`)</param>
+        /// <param name="page">The page to display (defaults to `1`)</param>
+        /// <returns>A successful query, got channels</returns>
+        public async Task<List<SearchVideo>> GetAllChannelsAsync(string q, bool? adult, long? page)
+        {
+            ArgumentNullException.ThrowIfNull(q);
+
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/search/videos?");
+            urlBuilder_.Append(Uri.EscapeDataString("q") + "=").Append(Uri.EscapeDataString(ConvertToString(q, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            if (adult != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("adult") + "=").Append(Uri.EscapeDataString(ConvertToString(adult, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            if (page != null)
+            {
+                urlBuilder_.Append(Uri.EscapeDataString("page") + "=").Append(Uri.EscapeDataString(ConvertToString(page, System.Globalization.CultureInfo.InvariantCulture))).Append("&");
+            }
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<SearchVideo>>(url_);
+        }
+        #endregion
+
+        #region Streams
+
+         /// <summary>
+        /// Get stream
+        /// </summary>
+        /// <param name="channel_id">Channel Id</param>
+        /// <returns>A successful query, got stream</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async Task<StreamBody> StreamsAsync(long channel_id)
+        {
+            ArgumentNullException.ThrowIfNull(channel_id);
+
+            StringBuilder urlBuilder_ = new ();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/channel/id/{channel_id}/streams");
+            urlBuilder_.Replace("{channel_id}", Uri.EscapeDataString(ConvertToString(channel_id, System.Globalization.CultureInfo.InvariantCulture)));
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<StreamBody>(url_);
+        }
+
+        /// <summary>
+        /// Get stream
+        /// </summary>
+        /// <param name="channel_name">Channel Id</param>
+        /// <returns>A successful query, got stream</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public async Task<StreamBody> StreamsAsync(string channel_name)
+        {
+            ArgumentNullException.ThrowIfNull(channel_name);
+
+            //Shouldnt this be /channel/name/{channel_name}/streams?
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/channel/id/{channel_name}/streams");
+            urlBuilder_.Replace("{channel_name}", Uri.EscapeDataString(ConvertToString(channel_name, System.Globalization.CultureInfo.InvariantCulture)));
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<StreamBody>(url_);
+        }
+
+        /// <summary>
+        /// Get all stream server endpoint
+        /// </summary>
+        /// <returns>A successful query, got all stream server endpoints</returns>
+        public async Task<List<StreamServer>> AllStreamsAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/stream/servers"); 
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<StreamServer>>(url_);
+        }
+
+        #endregion
+
+        #region Nofifications
+
+        /// <summary>
+        /// Get all global notifications/announcements
+        /// </summary>
+        /// <returns>A successful query, got global notifications</returns>
+        public async Task<List<Notifications>> NotificationsAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/notifications");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<Notifications>>(url_);
+        }
+
+        /// <summary>
+        /// Get this user’s notifications
+        /// </summary>
+        /// <returns>Got notifications</returns>
+        public async Task<List<GetUserNotification>> GetNotificationsAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/notifications");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<List<GetUserNotification>>(url_);
+        }
+
+        /// <summary>
+        /// Mark this notification as read
+        /// </summary>
+        /// <param name="uuid">UUID of the notification you wish to read</param>
+        /// <returns>Marked this notifications as read</returns>
+        public async Task<bool> PostNotificationsReadAsync(Guid uuid)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/notifications/{uuid}/read");
+            urlBuilder_.Replace("{uuid}", Uri.EscapeDataString(ConvertToString(uuid, System.Globalization.CultureInfo.InvariantCulture)));
+            string url_ = urlBuilder_.ToString();
+            return await PostAsync(url_);
+        }
+
+        #endregion
+
+        #region ChatSetting
+
+        /// <summary>
+        /// Get all chat settings
+        /// </summary>
+        /// <returns>Successfully got all chat settings</returns>
+        public async Task<DisplayChatSetting> GetChatSettingsAsync()
+        {
+
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<DisplayChatSetting>(url_);
+        }
+
+        /// <summary>
+        /// Update the chat display style setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsDisplaystyleAsync(ValueBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/displaystyle");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<ValueBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Update the chat whispers setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsWhispersAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/whispers");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Update the chat emotes setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsEmotesAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/emotes");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Update the chat sounds setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task<object> PostChatSettingsSoundsAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/sounds");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+
+        /// <summary>
+        /// Update the chat timestamps setting
+        /// </summary>
+        /// <returns>Successfully set</returns>
+        public async Task PostChatSettingsTimestampsAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/chat/settings/timestamps");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Get the current email settings
+        /// </summary>
+        /// <returns>Got current email settings</returns>
+        public async Task<EmailSettings> GetEmailsAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<EmailSettings>(url_);
+        }
+
+        /// <summary>
+        /// Toggle newsletter emails
+        /// </summary>
+        /// <returns>Enabled/disabled newsletter emails</returns>
+        public async Task PostEmailsNewsletterAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/newsletter");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Toggle stream online emails
+        /// </summary>
+        /// <returns>Enabled/disabled newsletter emails</returns>
+        public async Task<object> PostEmailsOnlineAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/online");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+        /// <summary>
+        /// Toggle new follower emails
+        /// </summary>
+        /// <returns>Enabled/disabled follower emails</returns>
+        public async Task PostEmailsFollowersAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/emails/follower");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Get state of mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off all notifications</returns>
+        public async Task<MobileNotify> GetMobilenotifyAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<MobileNotify>(url_);
+        }
+
+        /// <summary>
+        /// Enable/disable all mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off all notifications</returns>
+        public async Task PostMobilenotifyAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Enable/disable follow mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off follow notifications</returns>
+        public async Task<object> PostMobilenotifyFollowAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify/follow");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+        /// <summary>
+        /// Enable/disable live mobile notifications
+        /// </summary>
+        /// <returns>Switched on/off live notifications</returns>
+        public async Task PostMobilenotifyLiveAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify/live");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<EnableBody>(urlBuilder_.ToString(), content);
+        }
+
+        /// <summary>
+        /// Enable/disable subscribe notifications
+        /// </summary>
+        /// <returns>Switched on/off subscribe notifications</returns>
+        public async Task<object> PostMobilenotifySubscribeAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilenotify/subscribe");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+        /// <summary>
+        /// Check if a user can see adult content in-app
+        /// </summary>
+        /// <returns>Query successful, got adult app state</returns>
+        public async Task<bool> GetMobileSettingsAdultAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilesettings/adult");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync(url_);
+        }
+
+        /// <summary>
+        /// Enable/disable adult content in-app
+        /// </summary>
+        /// <returns>Successfully updated user adult mobile setting</returns>
+        public async Task<object> PostMobileSettingsAdultAsync(EnableBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/mobilesettings/adult");
+            return await PostAsync<EnableBody, object>(urlBuilder_.ToString(), body);
+        }
+
+
+        /// <summary>
+        /// Get information about the currently running multistream
+        /// </summary>
+        /// <returns>Get current multistream session/invites</returns>
+        public async Task<UserMultistream> GetUserMultistreamAsync()
+        {
+            StringBuilder urlBuilder_ = new();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/multistream");
+            string url_ = urlBuilder_.ToString();
+            return await GetAsync<UserMultistream>(url_);
+        }
+
+        /// <summary>
+        /// Invite a user to a multistream
+        /// </summary>
+        /// <returns>User invited to multistream</returns>
+        public async Task PostUserMultistreamInviteAsync(ChannelIDBody body)
+        {
+            var urlBuilder_ = new StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/user/multistream/invite");
+
+            string jsonContent = JsonConvert.SerializeObject(body);
+            HttpContent content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            await PostAsync<ChannelIDBody>(urlBuilder_.ToString(), content);
+        }
+
+        //To-Do: Implemented this
+        /// <summary>
+        /// Accept a multistream invite
+        /// </summary>
+        /// <returns>Accepted the multistream</returns>
+        public async Task<object> PostUserMultistreamAcceptAsync(ChannelIDBody body)
+        {
+            string url = "/user/multistream/accept";
+            throw new NotImplementedException();
+        }
+
+        //To-Do: Implemented this
+        /// <summary>
+        /// Remove someone from your multistream
+        /// </summary>
+        /// <returns>Removed this channel from the multistream</returns>
+        public Task<object> PostUserMultistreamRemoveAsync(ChannelIDBody body)
+        {
+            string url = "/user/multistream/remove";
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Decline a multistream invite/leave a multistream you were invited to
+        /// </summary>
+        /// <returns>Declined/left the multistream</returns>
+        public Task<object> PostUserMultistreamDeclineAsync(ChannelIDBody body)
+        {
+            string url = "/user/multistream/decline";
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region Misc
+
+
+
+        /// <summary>
+        /// Return a url that send a request to popout a chat based on input.
+        /// </summary>
+        /// <param name="name">input</param>
+        /// <returns>url to the chat</returns>
+        public string GetPopOutChat(string name = null)
+        {
+            return $"https://picarto.tv/chatpopout/{name}/public";
+        }
+
+        #endregion
+
         /// <summary>
         /// Get User's avatar as an string
         /// Useful for discord bot programming
         /// </summary>
         /// <param name="name">channel name</param>
         /// <returns>the user's avatar</returns>
-        public string GetUserAvatar(string name = null)
+        public async Task<string> GetUserAvatarAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-            }
-
             //var url = $"https://picarto.tv/user_data/usrimg/{name}/dsdefault.jpg";
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<BasicChannelInfo>(request);
-            return response.Data.Avatar;
+            var response = await ShowChannelByNameAsync(name);
+            return response.Avatar;
         }
 
 
@@ -251,48 +594,10 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">the name of the channel</param>
         /// <returns>a list of languages from the channel</returns>
-        public List<Language> GetChannelLanguages(string name = null)
+        public async Task<List<Language>> GetChannelLanguagesAsync(string name = null)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-                }
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Languages>(request);
-            return response.Data.ListofLanguages;
-        }
-
-        /// <summary>
-        /// Get an list over those who are online right now on Picarto
-        /// </summary>
-        /// <param name="adult">adult is false in default</param>
-        /// <param name="gaming">gaming is false in default</param>
-        /// <param name="category">category is empty in default</param>
-        /// <returns>a list over online channels</returns>
-        public List<OnlineDetails> GetOnlineChannels(bool adult = false, bool gaming = false, string category = null)
-        {
-            var request = GetRequest("online?adult={adult}&gaming={gaming}&categories={strings}", Method.GET);
-            request.AddUrlSegment("adult", adult.ToString());
-            request.AddUrlSegment("gaming", gaming.ToString());
-            if (string.IsNullOrEmpty(category))
-            {
-                category = "";
-                request.AddUrlSegment("strings", category);
-            }
-            else
-            {
-                request.AddUrlSegment("strings", category);
-            }
-            
-            request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<OnlineChannels>(request);
-            return response.Data.OnlineDetails;
+            var response = await ShowChannelByNameAsync(name);
+            return response.Languages;
         }
 
         /// <summary>
@@ -300,77 +605,9 @@ namespace PicartoWrapperAPI.Clients
         /// </summary>
         /// <param name="name">Username</param>
         /// <returns>thumbnail</returns>
-        public Thumbnail GetThumbnail(string name = null){
-           if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-                }
-            var request = GetRequest("channel/name/{name}", Method.GET);
-            request.AddUrlSegment("name", name);
-            var response = restClient.Execute<Channel>(request);
-            return response.Data.Thumbnail;
+        public async Task<Thumbnails> GetThumbnailAsync(string name = null){
+            var response = await ShowChannelByNameAsync(name);
+            return response.Thumbnail;
         } 
-        
-        /// <summary>
-        /// Return a url that send a request to popout a chat based on input.
-        /// </summary>
-        /// <param name="name">input</param>
-        /// <returns>url to the chat</returns>
-        public string GetPopOutChat(string name = null)
-        {
-            
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                if (string.IsNullOrEmpty(Clientname))
-                {
-                    throw new Exception("Clientname don't exist or it's empty!");
-                }
-                //if name is empty, check if there are Clientname
-                name = Clientname;
-                
-            }
-            string url = $"https://picarto.tv/chatpopout/{name}/public";
-            return url;
-        }
-
-        /// <summary>
-        /// Get Online catagories
-        /// </summary>
-        /// <returns>list over online catagories</returns>
-        public Categories GetOnlineCategories()
-        {
-            var request = GetRequest("categories", Method.GET);
-            request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<Categories>(request);
-            return response.Data;
-        }
-
-        /// <summary>
-        /// get Online events
-        /// </summary>
-        /// <returns>list over online events</returns>
-        public Events GetOnlineEvents()
-        {
-            var request = GetRequest("events", Method.GET);
-            request.RequestFormat = DataFormat.Json;
-            var response = restClient.Execute<Events>(request);
-            return response.Data;
-        }
-
-        /// <summary>
-        /// Fetch an request 
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="method"></param>
-        /// <returns>Restrequest variable</returns>
-        public RestRequest GetRequest(string url, Method method)
-        {
-            return new RestRequest(url, method);
-        }
     }
 }

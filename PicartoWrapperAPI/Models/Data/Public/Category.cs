@@ -1,18 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PicartoWrapperAPI.Models
+﻿namespace PicartoWrapperAPI.Models
 {
     public class Category
     {
-        public int Id { get; set; }
+        /// <summary>
+        /// The category ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
+        /// The category name
+        /// </summary>
         public string Name { get; set; }
-        public int Total_channels { get; set; }
-        public int Online_channels { get; set; }
-        public int Viewers { get; set; }
+
+        /// <summary>
+        /// The total number of channels that are this category
+        /// </summary>
+        public long Total_channels { get; set; }
+
+        /// <summary>
+        /// The number of channels that are live using this category
+        /// </summary>
+        public long Online_channels { get; set; }
+
+        /// <summary>
+        /// The total number of viewers
+        /// </summary>
+        public long Viewers { get; set; }
+
+        /// <summary>
+        /// If the category is an adult category
+        /// </summary>
         public bool Adult { get; set; }
     }
 }
